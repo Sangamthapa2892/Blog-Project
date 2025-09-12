@@ -1,0 +1,94 @@
+:root {
+  --hero-bg: linear-gradient(135deg, #fff7e6 0%, #fff1f0 100%);
+  --accent: #f59e0b;
+  --card-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+}
+
+.hero {
+  background: var(--hero-bg);
+  padding: 64px 0;
+  text-align: center;
+}
+
+.hero .lead {
+  max-width: 720px;
+  margin: 0.5rem auto 1.5rem;
+  color: #4b5563;
+}
+
+.btn-cta {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+}
+
+.btn-cta:focus {
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+  outline: none;
+}
+
+.values-list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* adjusted gap and card sizing so 3 cards align per row */
+.team-grid {
+  --bs-gutter-x: 1.5rem;  /* Bootstrap 5's native gutter variables */
+    --bs-gutter-y: 1.5rem;
+}
+
+.team-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: var(--card-shadow);
+  border: 0;
+  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+
+.team-card:focus,
+.team-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.12);
+  text-decoration: none;
+}
+
+.team-card img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.team-card .card-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+a:focus {
+  outline: 3px solid rgba(59, 130, 246, 0.25);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+  .hero {
+    padding: 40px 0;
+  }
+
+  .team-card {
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .team-card img {
+    width: 120px;
+    height: 120px;
+  }
+}

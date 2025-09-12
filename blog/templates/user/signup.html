@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra-css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<style>
+    #preview-image {
+    transition: opacity 0.3s ease-in-out;
+}
+</style>
+{% endblock extra-css %}
+
+{% block main-content %}
+<div class="container">
+    <form action="{% url 'signup' %}" method="POST">
+        <div class="row">
+            <div class="modal-header border-0">
+                <h1 class="modal-title text-gradient" id="signupModalLabel">Create Your Account</h1>
+            </div>
+            {% csrf_token %}
+            {% for message in messages %}
+            <div class="alert alert-{{message.tag}}">
+                {{message}}
+            </div>
+            {% endfor %}
+            {% for field in form %}
+            {% if field.name != 'profile_image' %}
+            <div class="col-md-6 mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                <div class="input-wrapper">{{ field }}</div>
+                {% for error in field.errors %}
+                <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Profile Image</label>
+
+                <!-- Custom clickable area -->
+                <label for="id_profile_image"
+                    class="custom-file d-flex align-items-center justify-content-between border rounded px-2 py-1"
+                    style="cursor:pointer;" aria-label="Upload profile image">
+                    <span id="file-name">Choose file...</span>
+                    <span id="clear-btn" class="text-danger fw-bold" style="display:none; cursor:pointer;"
+                        onclick="clearFile(event)">❌</span>
+                </label>
+
+                <!-- Hidden real input -->
+                <div class="d-none">
+                    {{ form.profile_image }}
+                </div>
+
+                <!-- Thumbnail preview -->
+                <div id="preview-container" class="mt-2">
+                <img id="preview-image" src="{% static 'images/img1.jpg' %}" alt="Preview" class="img-thumbnail"
+                    style="max-height: 150px;">
+                </div>
+
+                {% if form.profile_image.errors %}
+                <div class="text-danger small">{{ form.profile_image.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary w-25">Register</button>
+        </div>
+
+        <div class="mt-3 text-center">
+            <p class="mb-1">Already have an account?
+                <a href="{% url 'login' %}" class="auth-link">Log in here</a>
+            </p>
+        </div>
+
+    </form>
+</div>
+
+
+{% endblock main-content %}
+
+{% block extra-js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.login-card');
+        if (form) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            form.addEventListener('submit', function () {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Logging in...';
+                }
+            });
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fileInput = document.getElementById("id_profile_image");
+        const fileNameSpan = document.getElementById("file-name");
+        const clearBtn = document.getElementById("clear-btn");
+        const previewContainer = document.getElementById("preview-container");
+        const previewImage = document.getElementById("preview-image");
+
+        fileInput.style.display = "none";
+
+        fileInput.addEventListener("change", function () {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                fileNameSpan.textContent = file.name;
+                clearBtn.style.display = "inline";
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            } else {
+                fileNameSpan.textContent = "Choose file...";
+                clearBtn.style.display = "none";
+                previewContainer.style.display = "none";
+            }
+        });
+
+        window.clearFile = function (event) {
+            event.stopPropagation();
+            fileInput.value = "";
+            fileNameSpan.textContent = "Choose file...";
+            clearBtn.style.display = "none";
+            previewContainer.style.display = "none";
+            previewImage.src = "{% static 'images/img1.jpg' %}";
+        };
+    });
+</script>
+{% endblock extra-js %}

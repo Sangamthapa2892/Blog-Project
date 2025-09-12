@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra-css %}
+<style>
+    .hero {
+        background-image: linear-gradient(135deg,
+                var(--primary) 0%,
+                var(--secondary) 100%);
+    }
+
+    .card-img-wrapper {
+        width: 100%;
+        height: 250px;
+        /* or use auto, or a responsive unit like 30vh */
+        overflow: hidden;
+    }
+
+    .card-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock extra-css %}
+{% block main-content %}
+<main role="main">
+    <!-- Page content goes here -->
+    <div class="container my-5">
+        <div class="text-center py-5">
+            <h1 class="display-4 text-gradient mb-4">Welcome to MyBlog</h1>
+            <p class="lead mb-4">Experience modern web design with beautiful animations and responsive layouts</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'blog_list' %}" class="btn btn-outline-success interactive">
+                    <span>Explore Blog</span>
+                </a>
+                <a href="#sangam" class="btn btn-outline-success interactive">
+                    <span>Get Started</span>
+                </a>
+            </div>
+        </div>
+        <!-- Demo Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4 animate-delay-1">
+                <div class="card interactive">
+                    <div class="card-body text-center">
+                        <div class="text-gradient-accent mb-3">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                            </svg>
+                        </div>
+                        <h5 class="card-title">Lightning Fast</h5>
+                        <p class="card-text">Optimized performance with modern web technologies</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 animate-delay-2">
+                <div class="card interactive">
+                    <div class="card-body text-center">
+                        <div class="text-gradient-accent mb-3">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                <line x1="8" y1="21" x2="16" y2="21" />
+                                <line x1="12" y1="17" x2="12" y2="21" />
+                            </svg>
+                        </div>
+                        <h5 class="card-title">Responsive Design</h5>
+                        <p class="card-text">Beautiful layouts that work on any device</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 animate-delay-3">
+                <div class="card interactive">
+                    <div class="card-body text-center">
+                        <div class="text-gradient-accent mb-3">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12" />
+                            </svg>
+                        </div>
+                        <h5 class="card-title">Interactive</h5>
+                        <p class="card-text">Smooth animations and delightful user experience</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- 🌿 Hero Section -->
+<header id="sangam" class="hero text-white text-center py-5">
+    <h1>Sangam’s Dev Journal</h1>
+    <p class="lead">Where code meets creativity</p>
+</header>
+
+<!-- 🔧 What You'll Find -->
+<section class="container my-5">
+    <h2 class="mb-4 text-gradient">What You'll Find Here</h2>
+    <ul class="list-group">
+        <li class="list-group-item">Django Diaries: Real-world projects and admin tweaks</li>
+        <li class="list-group-item">Frontend Fixes: Bootstrap tricks and DOM adventures</li>
+        <li class="list-group-item">Secure & Deployed: HTTPS, Heroku, and domain setup</li>
+        <li class="list-group-item">Creative Bits: Logo design and blog aesthetics</li>
+        <li class="list-group-item">Code Snippets & Tutorials: Step-by-step guides</li>
+    </ul>
+</section>
+
+<!-- ✍️ Latest Posts -->
+<section class="container my-5">
+    <h2 class="mb-4 text-gradient">Latest Posts</h2>
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="card-img-wrapper">
+                        <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/default.jpg' %}{% endif %}"
+                            class="img-fluid card-img-top" alt="{{ blog.title|default:'Blog post image' }}">
+                    </div>
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.summary|truncatewords:30 }}</p>
+                    <a href="{% url 'blog_detail' post.slug %}" class="btn btn-outline-success">Read More</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No posts yet. Stay tuned!</p>
+        {% endfor %}
+        <!-- Pagination -->
+        <nav aria-label="Blog pagination" class="d-flex justify-content-center mb-5">
+            <ul class="pagination">
+        
+                <!-- Previous -->
+                {% if posts.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+                {% endif %}
+        
+                <!-- Page Numbers: current ±1 -->
+                {% for num in posts.paginator.page_range %}
+                {% if num >= posts.number|add:'-1' and num <= posts.number|add:'1' %} <li
+                    class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link"
+                        href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        {{ num }}
+                    </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+        
+                    <!-- Next -->
+                    {% if posts.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ posts.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                    {% endif %}
+        
+            </ul>
+        </nav>
+
+    </div>
+</section>
+{% endblock main-content %}

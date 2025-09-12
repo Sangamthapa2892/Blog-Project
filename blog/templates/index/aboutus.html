@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}   
+{% block extra-css %}
+<link rel="stylesheet" href="{% static 'css/aboutus.css' %}">
+{% endblock extra-css %}
+
+{% block main-content %}
+    <!-- main content (About Us) -->
+    <main role="main" class="container my-5">
+        <section class="hero rounded-3">
+            <div class="container">
+                <h1 class="display-4 fw-bold">About Us</h1>
+                <p class="lead">We’re a passionate team dedicated to building intuitive, scalable web solutions that
+                    help people focus on what matters. Clean code, clear communication, and delightful UX are our north
+                    star.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{% url 'blog_list' %}" class="btn btn-cta btn-lg" aria-label="View our blog">Explore our
+                        blog</a>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-secondary btn-lg"
+                        aria-label="Contact us">Contact
+                        Us</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="row align-items-start my-5">
+            <div class="col-md-6">
+                <article>
+                    <h2 class="h4">Our Mission</h2>
+                    <p>To empower businesses and individuals through clean, efficient, and user-friendly web
+                        applications. We value clarity, maintainability, and delight in every interface we ship.</p>
+                </article>
+            </div>
+            <div class="col-md-6">
+                <aside>
+                    <h2 class="h4">Our Values</h2>
+                    <ul class="values-list list-unstyled">
+                        <li>🔍 Transparency in code and communication</li>
+                        <li>🎯 Precision in design and functionality</li>
+                        <li>🚀 Continuous learning and improvement</li>
+                        <li>🤝 Collaboration and community</li>
+                    </ul>
+                </aside>
+            </div>
+        </section>
+
+        <section class="py-4 container">
+            <h2 class="h3 text-center mb-4">Meet the Team</h2>
+
+            <div class="row  gap-4 team-grid mb-3">
+                {% if team %}
+                {% for member in team %}
+                <div class="col mb-3">
+                    <a href="{{ member.profile_url|default:'#' }}" class="team-card card" tabindex="0"
+                        aria-label="View profile for {{ member.name }}">
+                        <img src="{% static member.image %}" alt="{{ member.name }} — {{ member.role }}"
+                            class="rounded-circle" loading="lazy" width="96" height="96">
+                        <div class="card-body">
+                            <h5 class="mb-1">{{ member.name }}</h5>
+                            <p class="mb-0 text-muted small">{{ member.role }}</p>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="col mb-3">
+                    <a href="#" class="team-card card" tabindex="0"
+                        aria-label="View profile for Sangam - Lead Developer">
+                        <img src="{% static 'images/img1.jpg' %}" alt="Sangam — Lead Developer" class="rounded-circle"
+                            loading="lazy" width="96" height="96">
+                        <div class="card-body">
+                            <h5 class="mb-1">Sangam</h5>
+                            <p class="mb-0 text-muted small">Lead Developer & UI/UX Architect</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col mb-3">
+                    <a href="#" class="team-card card" tabindex="0"
+                        aria-label="View profile for Dev - Backend Specialist">
+                        <img src="{% static 'images/img2.jpg' %}" alt="Dev — Backend Specialist" class="rounded-circle"
+                            loading="lazy" width="96" height="96">
+                        <div class="card-body">
+                            <h5 class="mb-1">Dev</h5>
+                            <p class="mb-0 text-muted small">Backend Specialist</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col mb-3">
+                    <a href="#" class="team-card card" tabindex="0"
+                        aria-label="View profile for Dev - Backend Specialist">
+                        <img src="{% static 'images/img2.jpg' %}" alt="Dev — Backend Specialist" class="rounded-circle"
+                            loading="lazy" width="96" height="96">
+                        <div class="card-body">
+                            <h5 class="mb-1">Dev</h5>
+                            <p class="mb-0 text-muted small">Backend Specialist</p>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock main-content %}

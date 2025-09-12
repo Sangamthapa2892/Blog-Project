@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+<title>{{ post.title }}</title>
+<style>
+    .modal {
+  align-items: center !important;
+}
+
+</style>
+{% block main-content %}
+<!-- blog-section start -->
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        {% if post.image %}
+        <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+        {% endif %}
+        <div class="card-body">
+            <h2 class="card-title">{{ post.title|capfirst }}</h2>
+            <p class="text-muted">
+                {% if post.author.profile_image %}
+                <img src="{{ post.author.profile_image.url }}" alt="Profile" class="rounded-circle me-2" width="32"
+                    height="32">
+                {% else %}
+                <img src="{% static 'images/img1.jpg' %}" alt="Default Avatar" class="rounded-circle me-2" width="32"
+                    height="32">
+                {% endif %}
+                By {{ post.author }} | {{ post.created_at|date:"F j, Y" }}
+            </p>
+            <p class="card-text">{{ post.content|linebreaks }}</p>
+
+            <hr>
+            <h5 id="comments">Comments <span class="badge bg-secondary">{{ comment_count }}</span></h5>
+
+            {% if comments_page %}
+            {% for comment in comments_page %}
+            <div class="comment mb-3 p-2 border rounded">
+                <div class="fw-bold">{{ comment.author }}</div>
+                <div class="text-muted small">{{ comment.created_at|date:"F j, Y, g:i a" }}</div>
+                <p class="mb-0">{{ comment.content }}</p>
+
+                <!-- Reply button -->
+                <button class="btn btn-sm btn-link" data-bs-toggle="collapse"
+                    data-bs-target="#replyForm{{ comment.id }}">
+                    Reply
+                </button>
+
+                <!-- Reply form -->
+                <div class="collapse mt-2" id="replyForm{{ comment.id }}">
+                    <form method="POST" action="{% url 'blog_detail' post.slug %}#comments">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-sm btn-primary">Post Reply</button>
+                    </form>
+                </div>
+                {% if request.user.is_authenticated and request.user == comment.author %}
+                <!-- Edit Button -->
+                <a href="{% url 'edit_comment' comment.id %}" class="btn btn-sm">
+                    ✏️ Edit
+                </a>
+
+                <!-- Delete Button (Bootstrap Modal Trigger) -->
+                <button type="button" class="btn btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#deleteCommentModal{{ comment.id }}">
+                    🗑️ Delete
+                </button>
+                {% endif %}
+
+                <!-- Replies -->
+                {% for reply in comment.replies.all %}
+                <div class="ms-4 mt-2 p-2 border rounded bg-light">
+                    <div class="fw-bold">{{ reply.author }}</div>
+                    <div class="text-muted small">{{ reply.created_at|date:"F j, Y, g:i a" }}</div>
+                    <p class="mb-0">{{ reply.content }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+           
+
+            {% if comments_page.has_next %}
+            <div class="text-center mt-3">
+                <a href="?page={{ comments_page.next_page_number }}#comments" class="btn btn-link">View more
+                    comments</a>
+            </div>
+            {% else %}
+            <p class="text-muted text-center mt-3">That's all for now — be the next to comment!</p>
+            {% endif %}
+            {% else %}
+            <p class="text-muted">No comments yet.</p>
+            {% endif %}
+        </div>
+        
+    </div>
+    <!-- comment section -->
+    <div class="card mt-3 mb-5">
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert" id="autoDismissAlert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card-body">
+            {% if user.is_authenticated %}
+            <h5 class="card-title">Leave a Comment:</h5>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="page" value="{{ comments_page.number }}">
+
+                <div class="mb-3">
+                    {% render_field form.content %}
+                    {% if form.content.errors %}
+                    <div class="text-danger small mt-1">{{ form.content.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            {% else %}
+            <p><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to leave a comment.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% for comment in comments_page %}
+<div class="modal fade" id="deleteCommentModal{{ comment.id }}" tabindex="-1"
+    aria-labelledby="deleteCommentLabel{{ comment.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteCommentLabel{{ comment.id }}">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this comment?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="{% url 'delete_comment' comment.id %}" class="btn btn-danger">Yes, Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<script>
+    setTimeout(function () {
+        const alert = document.getElementById('autoDismissAlert');
+        if (alert) {
+            alert.classList.remove('show');
+        }
+    }, 4000); // dismiss after 4 seconds
+
+    const myModal = document.getElementById('myModal')
+    const myInput = document.getElementById('myInput')
+</script>
+{% endblock main-content %}

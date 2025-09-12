@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra-css %}
+<link rel="stylesheet" href="{% static 'css/contact.css' %}">
+{% endblock extra-css %}
+{% block main-content %}
+<div class="container py-5">
+    <form method="POST" enctype="multipart/form-data" class="p-4 shadow rounded bg-white">
+        <h2 class="mb-4 heading" style="background-color: --gradient-primary;">Edit Profile</h2>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+</div>
+{% endblock %}
