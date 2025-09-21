@@ -133,6 +133,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_URL = '/static/'
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Optional: for custom static folders
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')    # Where collectstatic will gather files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Media files (user uploads)
 MEDIA_URL = '/media/'

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block extra-css %}
-<link rel="stylesheet" href="{% static 'css/blog.css' %}">
+<link rel="stylesheet" href="{% static '/blog/css/blog.css' %}">
 <style>
   .btn-click {
     background-color: #378d06;
@@ -34,7 +34,7 @@
   </div>
 </header>
 
-<main class="container">
+<main class="container ">
   <!-- Stats and Filters -->
   <div class="stats-bar d-flex justify-content-between align-items-center flex-wrap">
     <div class="d-flex align-items-center gap-3">
@@ -81,7 +81,7 @@
     <!-- Sample Blog Post 1 -->
     <div class="col-12 col-md-6 col-xl-4">
       <article class="blog-card card">
-        <img src="{% if blog.image %}{{ blog.image.url }}{% else %}/static/images/default.jpg{% endif %}"
+        <img src="{% if blog.image %}{{ blog.image.url }}{% else %}/static/blog/images/img.png{% endif %}"
           class="card-img-top" alt="{{ blog.title|default:'Blog post image' }}">
         <div class="card-body">
           <h3 class="blog-title">
@@ -97,7 +97,7 @@
               <img src="{{ blog.author.profile_image.url }}" alt="{{ blog.author.username }}'s Profile"
                 class="rounded-circle me-2" width="32" height="32">
               {% else %}
-              <img src="{% static 'images/img1.jpg' %}" alt="Default Avatar" class="rounded-circle me-2" width="32"
+              <img src="{% static '/blog/images/img1.jpg' %}" alt="Default Avatar" class="rounded-circle me-2" width="32"
                 height="32">
               {% endif %}
               {{blog.author}}
@@ -158,7 +158,7 @@
   </div>
 
   <!-- Pagination -->
-  <nav aria-label="Blog pagination" class="d-flex justify-content-center mb-5">
+  <nav aria-label="Blog pagination" class="d-flex justify-content-center mb-5 py-5">
     <ul class="pagination">
 
       <!-- Previous -->
@@ -201,11 +201,6 @@
   </nav>
 </main>
 
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-
-
 <script>
   // Add smooth scrolling and interaction effects
   document.addEventListener('DOMContentLoaded', function () {
@@ -242,7 +237,5 @@
       alertInstance.close();
     });
   }, 3000);
-  const myModal = document.getElementById('myModal')
-  const myInput = document.getElementById('myInput')
 </script>
 {% endblock main-content %}

@@ -24,7 +24,7 @@ class CommentForm(forms.ModelForm):
                 'placeholder': 'Write your comment here...'
             })
         }
-        
+User = get_user_model()        
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     phone = forms.CharField(required=False)
@@ -41,6 +41,9 @@ class CustomUserCreationForm(UserCreationForm):
             'onchange': 'updateFileName()'
         })
     )
+    class Meta:
+        model = User  # ✅ This tells Django to use your custom user model
+        fields = ('username', 'email', 'password1', 'password2')
     
 User = get_user_model()
 class EditProfileForm(forms.ModelForm):

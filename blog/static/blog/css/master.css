@@ -88,7 +88,7 @@ body::before {
   transition: var(--transition);
   position: sticky;
   top: 0;
-  z-index: 1030;
+  z-index: 100;
 }
 
 .navbar.scrolled {
@@ -205,18 +205,25 @@ body::before {
   z-index: 1;
 }
 
-.btn-outline-success {
-  background: var(--gradient-accent);
+.btn-outline {
+  background: var(--gradient-primary);
   color: white;
-  border: 2px solid transparent;
+  outline: 2px solid linear-gradient(to right,#667eea 0%,#764ba2 100%);
   box-shadow: var(--shadow-sm);
 }
+.modal {
+  z-index: 2000 !important;
+  position: relative !important;
+}
+.modal-backdrop {
+   display: none !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
 
-.btn-outline-success:hover {
-  background: var(--success);
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-  color: white;
+.btn-outline:hover {
+  background: var(--light);
+  outline: 2px solid #9168bb;
+  color: black;
 }
 
 .btn-outline-danger {
@@ -225,7 +232,17 @@ body::before {
   border: 2px solid transparent;
   box-shadow: var(--shadow-sm);
 }
+.btn-outline2 {
+  background: var(--light);
+  outline: 2px solid #9168bb;
+  color: black;
+}
 
+.btn-outline2:hover {
+  background:var(--gradient-primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
 .btn-outline-danger:hover {
   background: #dc2626;
   transform: translateY(-3px);
@@ -334,7 +351,7 @@ footer a:hover::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 100;
   opacity: 1;
   transition: opacity 0.5s ease;
 }
@@ -370,8 +387,8 @@ footer a:hover::after {
   left: 0;
   width: 0%;
   height: 4px;
-  background: var(--gradient-accent);
-  z-index: 1031;
+  background: var(--gradient-primary);
+  z-index: 100;
   transition: width 0.1s ease;
 }
 
@@ -399,7 +416,7 @@ footer a:hover::after {
   top: 50%;
   right: 2rem;
   transform: translateY(-50%);
-  z-index: 1020;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -409,7 +426,7 @@ footer a:hover::after {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--gradient-accent);
+  background: var(--gradient-primary);
   color: white;
   border: none;
   display: flex;
@@ -721,6 +738,13 @@ footer a:hover::after {
 
 .auth-link:hover {
     text-decoration: underline;
+}
+.btn-outline-success:active,
+.btn-outline-success:focus {
+  background: var(--light); /* or transparent */
+  color: black;
+  outline: 2px solid #764ba2; /* optional */
+  box-shadow: var(--shadow-lg);
 }
 
 /* ===== Animation ===== */

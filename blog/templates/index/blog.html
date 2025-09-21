@@ -31,7 +31,7 @@
         <div class="me-3">
             <form method="GET" class="d-flex mb-4" role="search">
                 <input type="text" name="search" value="{{ search }}" class="form-control me-2" placeholder="Search your posts...">
-                <button type="submit" class="btn btn-outline-primary search-btn">🔍 Search</button>
+                <button type="submit" class="btn btn-outline search-btn">🔍 Search</button>
             </form>
         </div>
 
@@ -62,7 +62,7 @@
         <!-- Sample Blog Post 1 -->
         <div class="col-12 col-md-6 col-xl-4">
             <article class="blog-card card">
-                <img src="{% if blog.image %}{{ blog.image.url }}{% else %}/static/images/default.jpg{% endif %}"
+                <img src="{% if blog.image %}{{ blog.image.url }}{% else %}/static/blog/images/img.png{% endif %}"
                     class="card-img-top" alt="{{ blog.title|default:'Blog post image' }}">
                 <div class="card-body">
                     <h3 class="blog-title">
@@ -168,6 +168,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         // Add loading animation for cards
         const cards = document.querySelectorAll('.blog-card');
+        const adminbutton = document.getElementById('userDropdown')
         cards.forEach((card, index) => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
@@ -188,6 +189,15 @@
                 this.style.transform = 'translateY(0) scale(1)';
             });
         });
+
+        const toggleBtn = document.getElementById("userDropdown");
+        const dropdown = new bootstrap.Dropdown(toggleBtn);
+
+        toggleBtn.addEventListener("click", function (e) {
+            e.preventDefault(); // prevent default anchor behavior
+            dropdown.toggle();  // manually toggle dropdown
+        });
+
     });
         
 </script>

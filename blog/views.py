@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
+from django.http import HttpResponseNotAllowed
 from . forms import CustomUserCreationForm, LoginForm, BlogForm, CommentForm, EditProfileForm
 from django.contrib import messages
 from datetime import datetime, timedelta
@@ -17,23 +18,26 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.views import PasswordResetView
+from django.utils.http import url_has_allowed_host_and_scheme
+from django_ratelimit.decorators import ratelimit
+
 
 # Create your views here.
 def home(request):
     User = get_user_model()
     admin_user = User.objects.get(username='admin1')
     admin_posts = Blog.objects.filter(author=admin_user).order_by('-created_at')
-    paginator = Paginator(admin_posts, 4)  # Show 5 posts per page
+    paginator = Paginator(admin_posts, 4)
     page = request.GET.get('page')
+
     try:
-        posts = paginator.page(page)
+        page_obj = paginator.page(page)
     except PageNotAnInteger:
-        posts = paginator.page(1)
+        page_obj = paginator.page(1)
     except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
+        page_obj = paginator.page(paginator.num_pages)
 
-    return render(request, 'index/home.html', {'posts': posts})
-
+    return render(request, 'index/home.html', {'page_obj': page_obj})
 
 def signup_view(request):
     if request.method == 'POST':
@@ -57,6 +61,7 @@ def signup_view(request):
         form = CustomUserCreationForm()
     return render(request, 'user/signup.html', {'form':form})
 
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -64,11 +69,11 @@ def login_view(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
-            if user is not None:
+            if user is not None and user.is_active:
                 login(request, user)
-                return redirect('blog_list')  # or wherever you want to go
+                return redirect_with_next(request, default='dashboard') # or wherever you want to go
             else:
-                form.add_error(None, 'Invalid credentials')
+                form.add_error(None, 'Invalid credentials or inactive account.')
     else:
         form = LoginForm()
     return render(request, 'user/login.html', {'form':form, 'fixed_footer': True})
@@ -78,7 +83,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out successfully.")
-    return redirect('home')  # or redirect to 'home' or any landing page
+    return redirect('login')  # or redirect to 'home' or any landing page
 
 def blog(request):
     search = request.GET.get('search')
@@ -123,35 +128,49 @@ def create_blog(request):
 
 def blog_detail(request, slug):
     post = get_object_or_404(Blog, slug=slug)
-    # Only top-level comments for pagination
+    edit_id = request.GET.get('edit')
+    edit_form = None
+    edit_comment = None
+
+    if edit_id:
+        try:
+            edit_comment = Comment.objects.get(id=edit_id, blog=post, author=request.user)
+            edit_form = CommentForm(instance=edit_comment)
+        except Comment.DoesNotExist:
+            messages.error(request, "You don't have permission to edit this comment.")
+
+    # Top-level comments only for pagination
     comments = post.comments.filter(approved=True, parent__isnull=True).order_by('-created_at')
     comment_count = post.comments.filter(approved=True).count()
-    # Track views
+
+    # View tracking
     view_key = f'viewed_post_{post.id}'
     if not request.session.get(view_key):
         post.views += 1
         post.save(update_fields=['views'])
         request.session[view_key] = True
+
     paginator = Paginator(comments, 3)
     page_number = request.POST.get('page') or request.GET.get('page')
     comments_page = paginator.get_page(page_number)
+
     # Handle comment/reply submission
     if request.method == 'POST':
         if not request.user.is_authenticated:
             messages.error(request, "You must be logged in to post a comment.")
             return redirect(f"{reverse('login')}?next={request.path}")
+
         form = CommentForm(request.POST)
         if form.is_valid():
             parent_id = request.POST.get('parent_id')
-            parent_comment = None
-            if parent_id:
-                parent_comment = Comment.objects.filter(id=parent_id, blog=post).first()
+            parent_comment = Comment.objects.filter(id=parent_id, blog=post).first() if parent_id else None
             comment = form.save(commit=False)
             comment.blog = post
             comment.author = request.user
             comment.parent = parent_comment
             comment.approved = True
             comment.save()
+
             messages.success(request, "Your comment was posted successfully!")
             return redirect(f'{reverse("blog_detail", kwargs={"slug": slug})}?page={page_number}#comments')
     else:
@@ -161,7 +180,9 @@ def blog_detail(request, slug):
         'post': post,
         'comments_page': comments_page,
         'form': form,
-        'comment_count': comment_count
+        'comment_count': comment_count,
+        'edit_form': edit_form,
+        'edit_comment': edit_comment,
     })
 
 @login_required
@@ -174,16 +195,20 @@ def edit_comment(request, comment_id):
             messages.success(request, "Comment updated successfully.")
             return redirect(f'{comment.blog.get_absolute_url()}#comments')
     else:
-        form = CommentForm(instance=comment)
-    return render(request, 'blog/edit_comment.html', {'form': form})
+        # Redirect with ?edit=comment_id
+        return redirect(f'{comment.blog.get_absolute_url()}?edit={comment.id}#comments')
 
 @login_required
 def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
-    blog_slug = comment.blog.slug
-    comment.delete()
-    messages.success(request, "Comment deleted successfully.")
-    return redirect(f"{reverse('blog_detail', kwargs={'slug': blog_slug})}#comments")
+    if request.method == 'POST':
+        print("DELETE triggered for comment:", comment_id)
+        comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+        blog_slug = comment.blog.slug
+        comment.delete()
+        messages.success(request, "Comment deleted successfully.")
+        return redirect(f"{reverse('blog_detail', kwargs={'slug': blog_slug})}#comments")
+    else:
+        return HttpResponseNotAllowed(['POST'])
 
 @login_required    
 def profile_view(request):
@@ -279,5 +304,11 @@ class CustomPasswordResetView(PasswordResetView):
         context['domain'] = settings.DEFAULT_DOMAIN
         return context
 
+
+
+
 def redirect_with_next(request, default='home'):
-    return redirect(request.GET.get('next') or reverse(default))
+    next_url = request.GET.get('next')
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return redirect(next_url)
+    return redirect(reverse(default))

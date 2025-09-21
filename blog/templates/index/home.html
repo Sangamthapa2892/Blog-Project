@@ -20,6 +20,41 @@
         height: 100%;
         object-fit: cover;
     }
+/* Base pagination styling */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.page-item {
+  list-style: none;
+}
+
+.page-link {
+  padding: 8px 12px;
+  border: 1px solid #764ba2;
+  color: #764ba2;
+  background-color: #fff;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+/* Hover effect */
+.page-link:hover {
+  background-color: #764ba2;
+  color: white;
+}
+
+/* Active page styling */
+.page-item.active .page-link {
+  background: linear-gradient(to right, #764ba2, #667eea);
+  color: white;
+  border: none;
+  font-weight: bold;
+  box-shadow: 0 0 5px rgba(118, 75, 162, 0.5);
+}
 </style>
 {% endblock extra-css %}
 {% block main-content %}
@@ -30,10 +65,10 @@
             <h1 class="display-4 text-gradient mb-4">Welcome to MyBlog</h1>
             <p class="lead mb-4">Experience modern web design with beautiful animations and responsive layouts</p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="{% url 'blog_list' %}" class="btn btn-outline-success interactive">
+                <a href="{% url 'blog_list' %}" class="btn btn-outline interactive">
                     <span>Explore Blog</span>
                 </a>
-                <a href="#sangam" class="btn btn-outline-success interactive">
+                <a href="#sangam" class="btn btn-outline2 interactive">
                     <span>Get Started</span>
                 </a>
             </div>
@@ -114,12 +149,12 @@
             <div class="card h-100">
                 <div class="card-body">
                     <div class="card-img-wrapper">
-                        <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/default.jpg' %}{% endif %}"
+                        <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'blog/images/img.png' %}{% endif %}"
                             class="img-fluid card-img-top" alt="{{ blog.title|default:'Blog post image' }}">
                     </div>
                     <h5 class="card-title">{{ post.title }}</h5>
                     <p class="card-text">{{ post.summary|truncatewords:30 }}</p>
-                    <a href="{% url 'blog_detail' post.slug %}" class="btn btn-outline-success">Read More</a>
+                    <a href="{% url 'blog_detail' post.slug %}" class="btn btn-outline">Read More</a>
                 </div>
             </div>
         </div>
@@ -131,20 +166,20 @@
             <ul class="pagination">
         
                 <!-- Previous -->
-                {% if posts.has_previous %}
+                {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link"
+                    <a class="page-link text-gradient"
                         href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a>
                 </li>
                 {% else %}
                 <li class="page-item disabled">
-                    <span class="page-link">Previous</span>
+                    <span class="page-link text-gradient">Previous</span>
                 </li>
                 {% endif %}
         
                 <!-- Page Numbers: current ±1 -->
-                {% for num in posts.paginator.page_range %}
-                {% if num >= posts.number|add:'-1' and num <= posts.number|add:'1' %} <li
+                {% for num in page_obj.paginator.page_range %}
+                {% if num >= page_obj.number|add:'-1' and num <= page_obj.number|add:'1' %} <li
                     class="page-item {% if page_obj.number == num %}active{% endif %}">
                     <a class="page-link"
                         href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
@@ -155,10 +190,10 @@
                     {% endfor %}
         
                     <!-- Next -->
-                    {% if posts.has_next %}
+                    {% if page_obj.has_next %}
                     <li class="page-item">
                         <a class="page-link"
-                            href="?page={{ posts.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a>
+                            href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a>
                     </li>
                     {% else %}
                     <li class="page-item disabled">

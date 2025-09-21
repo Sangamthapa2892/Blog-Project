@@ -1,17 +1,5 @@
 {% extends "base.html" %}
 {% load static %}
-{% block extra-css %}
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
-{% endblock extra-css %}
-<style>
-    .fixed-bottom {
-        position: fixed !important;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 1030;
-    }
-</style>
 {% block main-content %}
 <div class="container w-50 mb-5">
     <form method="POST">
@@ -52,14 +40,14 @@
         {% endif %}
         {% endfor %}
 
-        <button type="submit" class="btn btn-primary w-100">Login</button>
+        <button type="submit" class="btn btn-outline w-100">Login</button>
 
         <div class="mt-3">
             <p class="mb-1">Don't have an account?
-                <a href="{% url 'signup' %}" class="auth-link">Sign up here</a>
+                <a href="{% url 'signup' %}" class="auth-link" style="color: var(--secondary);">Sign up here</a>
             </p>
             <p class="mb-0">Forgot your password?
-                <a href="{% url 'password_reset' %}" class="auth-link">Reset it here</a>
+                <a href="{% url 'password_change' %}" class="auth-link" style="color: var(--secondary);">Reset it here</a>
             </p>
         </div>
     </form>

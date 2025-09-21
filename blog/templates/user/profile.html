@@ -2,10 +2,6 @@
 {% load static %}
 <style>
     /* profile.css */
-    .profile-container {
-        background: linear-gradient(to right, #f8f9fa, #e9ecef);
-        min-height: 80vh;
-    }
 
     .profile-card {
         background-color: #fff;
@@ -42,7 +38,7 @@
     }
 </style>
 {% block main-content %}
-<div class="profile-container py-5">
+<div class="container py-1">
     <div class="row justify-content-center">
         <div class="col-md-10 profile-card shadow-lg rounded-4 p-4 bg-white">
             <div class="row align-items-center">
@@ -53,7 +49,7 @@
                         class="img-fluid rounded-circle profile-img mb-3"
                         style="width: 200px; height: 200px; object-fit: cover;">
                     {% else %}
-                    <img src="{% static 'images/img1.jpg' %}" alt="{{ user.username }}"
+                    <img src="{% static 'blog/images/img1.jpg' %}" alt="{{ user.username }}"
                         class="img-fluid rounded-circle profile-img mb-3"
                         style="width: 200px; height: 200px; object-fit: cover;">
                     {% endif %}

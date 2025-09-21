@@ -1,17 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-{% block extra-css %}
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
-<style>
-    #preview-image {
-    transition: opacity 0.3s ease-in-out;
-}
-</style>
-{% endblock extra-css %}
-
 {% block main-content %}
 <div class="container">
-    <form action="{% url 'signup' %}" method="POST">
+    <form action="{% url 'signup' %}" class="test" method="POST">
         <div class="row">
             <div class="modal-header border-0">
                 <h1 class="modal-title text-gradient" id="signupModalLabel">Create Your Account</h1>
@@ -53,41 +44,37 @@
 
                 <!-- Thumbnail preview -->
                 <div id="preview-container" class="mt-2">
-                <img id="preview-image" src="{% static 'images/img1.jpg' %}" alt="Preview" class="img-thumbnail"
-                    style="max-height: 150px;">
+                    <img id="preview-image" src="{% static '/blog/images/img1.jpg' %}" alt="Preview"
+                        class="img-thumbnail" style="max-height: 150px;">
+                    {% if form.profile_image.errors %}
+                    <div class="text-danger small">{{ form.profile_image.errors.0 }}</div>
+                    {% endif %}
                 </div>
+            </div>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-outline w-100" >Register</button>
+            </div>
 
-                {% if form.profile_image.errors %}
-                <div class="text-danger small">{{ form.profile_image.errors.0 }}</div>
-                {% endif %}
+            <div class="mt-3 text-center">
+                <p class="mb-1">Already have an account?
+                    <a href="{% url 'login' %}" class="auth-link" style="color: var(--secondary);">Log in here</a>
+                </p>
             </div>
         </div>
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary w-25">Register</button>
-        </div>
-
-        <div class="mt-3 text-center">
-            <p class="mb-1">Already have an account?
-                <a href="{% url 'login' %}" class="auth-link">Log in here</a>
-            </p>
-        </div>
-
     </form>
 </div>
-
-
 {% endblock main-content %}
 
 {% block extra-js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('.login-card');
+        const form = document.querySelector('form');
         if (form) {
             const submitBtn = form.querySelector('button[type="submit"]');
             form.addEventListener('submit', function () {
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.textContent = 'Logging in...';
+                    submitBtn.textContent = 'Signing in...';
                 }
             });
         }
@@ -112,7 +99,7 @@
                 // Show preview
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    previewImage.src = e.target.result;
+                    previewImage.src = e.target.result || "{% static '/blog/images/img1.jpg' %}";
                     previewContainer.style.display = "block";
                 };
                 reader.readAsDataURL(file);

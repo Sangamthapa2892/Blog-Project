@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db.models import Count
 from django import forms
 from django.conf import settings
+from django.urls import reverse
 
 # Create your models here.
 
@@ -60,7 +61,9 @@ class Blog(models.Model):
                 counter += 1
             self.slug = slug
         super().save(*args, **kwargs)
-    
+    def get_absolute_url(self):
+        return reverse('blog_detail', kwargs={'slug': self.slug})
+
 class Comment(models.Model):
     blog = models.ForeignKey('Blog', on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -71,6 +74,10 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.author} on {self.blog.title}'
+    
+    def is_reply(self):
+        return self.parent is not None
+
     
 class Contact(models.Model):
     name = models.CharField(max_length=100)
