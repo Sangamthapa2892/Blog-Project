@@ -22,7 +22,7 @@ Tech Stack:
 
 Setup Instructions:
 1. Clone the repository:
-   git clone https://github.com/yourusername/your-repo-name.git
+   git clone https://github.com/Sangamthapa2892/Blog-Project.git
 
 2. Create a virtual environment and install dependencies:
    python -m venv venv
